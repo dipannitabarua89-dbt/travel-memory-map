@@ -1,0 +1,59 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+package "com.travelvault" {
+  abstract class Memory implements Comparable {
+    - title : String
+    - dateVisited : LocalDate
+    - rating : int
+    - notes : String
+    + {abstract} getCategory() : String
+    + {abstract} getSpecificDetails() : String
+    + getSummary() : String
+    + compareTo(other : Memory) : int
+  }
+  class LandmarkMemory extends Memory {
+    - architecturalStyle : String
+    - entryFeeEur : double
+  }
+  class CulinaryMemory extends Memory {
+    - dishName : String
+    - priceEur : double
+  }
+  class City {
+    - name : String
+    - memories : List<Memory>
+    + getAverageRating() : double
+  }
+  class Country {
+    - name : String
+    - continent : String
+    - cities : List<City>
+  }
+  class InvalidMemoryException extends RuntimeException
+  class Main
+}
+package "com.travelvault.strategy" {
+  interface MemoryFilterStrategy {
+    + filter(memories : List<Memory>) : List<Memory>
+    + getDescription() : String
+  }
+  class AllMemoriesStrategy implements MemoryFilterStrategy
+  class CategoryFilterStrategy implements MemoryFilterStrategy
+  class MinRatingFilterStrategy implements MemoryFilterStrategy
+}
+package "com.travelvault.service" {
+  class TravelVaultService
+  class VaultStorage
+}
+package "com.travelvault.ui" {
+  class WebMapServer
+}
+Country "1" *-- "0..*" City
+City "1" *-- "0..*" Memory
+TravelVaultService "1" o-- "0..*" Country
+TravelVaultService "1" --> "1" MemoryFilterStrategy
+TravelVaultService "1" --> "1" VaultStorage
+Memory ..> InvalidMemoryException : throws
+Main ..> TravelVaultService
+WebMapServer ..> TravelVaultService
+@enduml
